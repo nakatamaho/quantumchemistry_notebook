@@ -1,0 +1,31 @@
+#!/bin/bash
+# The path to ORCA should be added to .bashrc or exported in command line
+
+if [ -z $2 ]
+then
+  echo " need two arguments! "
+  exit
+fi
+
+#echo " in ograd: $1 $2 "
+
+ofile=orcain$1.in
+ofileout=orcain$1.out
+molfile=structure$1
+ncpu=$2
+basename="${ofile%.*}"
+#echo " ofile: $ofile ofileout: $ofileout molfile: $molfile ncpu: $ncpu"
+
+########## XTB/TM settings: #################
+cd scratch
+wc -l < $molfile > $ofile.xyz
+echo "Dummy for XTB/TM calculation" >> $ofile.xyz
+cat $molfile >> $ofile.xyz
+
+
+#echo "running: TM/XTB $ofile > $ofileout"
+xtb $ofile.xyz -grad -chrg 0 > $ofile.xtbout
+
+tm2orca.py $basename
+rm xtbrestart
+cd ..
